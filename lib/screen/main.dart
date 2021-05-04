@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import "./result.dart";
+import "./question.dart";
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,8 +17,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.indigo,
       ),
-      home: MyHomePage(title: '性格診断'),
+      home: MyHomePage(title: 'ホーム'),
       routes: {
+        QuestionPage.id: (context) => QuestionPage(),
         ResultPage.id: (context) => ResultPage(),
       },
     );
@@ -32,19 +35,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _questionNumber = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _questionNumber++;
-    });
-
-    if (_questionNumber >= questions.length) {
-      _questionNumber = 0;
-      Navigator.pushNamed(context, ResultPage.id);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,27 +43,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              questions[_questionNumber],
+              '性格診断',
             ),
             ElevatedButton(
-              child: const Text('はい'),
+              child: const Text('診断開始'),
               style: ElevatedButton.styleFrom(
                 primary: Colors.indigo,
                 onPrimary: Colors.white,
@@ -81,18 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: _incrementCounter,
-            ),
-            OutlinedButton(
-              child: const Text('いいえ'),
-              style: OutlinedButton.styleFrom(
-                primary: Colors.indigo,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                side: const BorderSide(),
-              ),
-              onPressed: _incrementCounter,
+              onPressed: () {
+                Navigator.pushNamed(context, QuestionPage.id);
+              },
             ),
           ],
         ),
