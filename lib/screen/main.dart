@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import "./result.dart";
 
@@ -32,17 +33,57 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  static int _questionSeconds = 5;
   int _questionNumber = 0;
+  int _currentSeconds = _questionSeconds;
+
+  @override
+  void initState() {
+    _startTimer();
+    super.initState();
+  }
+
+  void _nextQuestion() {
+    _incrementCounter();
+
+    if (_questionNumber >= questions.length) {
+      _endQuestions();
+    } else {
+      _startTimer();
+    }
+  }
 
   void _incrementCounter() {
     setState(() {
       _questionNumber++;
     });
+  }
 
-    if (_questionNumber >= questions.length) {
-      _questionNumber = 0;
-      Navigator.pushNamed(context, ResultPage.id);
-    }
+  void _endQuestions() {
+    _questionNumber = 0; // 不要かもしれないので一旦コメントアウト
+    Navigator.pushNamed(context, ResultPage.id);
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _currentSeconds = _questionSeconds;
+    Timer.periodic(
+      Duration(seconds: 1), // 1秒ごとに処理
+      (_timer) => setState(
+        () {
+          if (_currentSeconds < 2) { // 本当は1に設定すべきだが、0が画面に表示されてしまうので2にしている
+            _timer.cancel();
+            _nextQuestion();
+          } else {
+            _currentSeconds = _currentSeconds - 1; // 1秒ずつデクリメント
+          }
+        },
+      ),
+    );
+  }
+
+  void _resetTimer() {
+    _currentSeconds = _questionSeconds;
   }
 
   @override
@@ -53,22 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(
+              '$_currentSeconds',
+            ),
             Text(
               questions[_questionNumber],
             ),
@@ -81,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: _incrementCounter,
+              onPressed: _nextQuestion,
             ),
             OutlinedButton(
               child: const Text('いいえ'),
@@ -92,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 side: const BorderSide(),
               ),
-              onPressed: _incrementCounter,
+              onPressed: _nextQuestion,
             ),
           ],
         ),
